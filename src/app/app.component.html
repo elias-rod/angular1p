@@ -25,7 +25,7 @@
       <td>{{persona.dni}}</td>
       <td>{{(persona.sexo == 'f') ? 'femenino' : 'masculino'}}</td>       
       <td><img [ngStyle]="{'width': '100px'}" src="http://localhost/fotos/{{persona.dni}}.png"></td>
-      <td><button (click)="EliminarPersona(persona.id)">Eliminar</button></td>
+      <td><button (click)="EliminarPersona(persona.id, persona.dni)">Eliminar</button></td>
     </tr>
   </table>
 </div>

@@ -1,12 +1,12 @@
 <?php
-require_once "Personas.php";
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
+require_once "persona.php";
 require 'vendor/autoload.php';
 
-$app = new Slim\App;
+$app = new \Slim\App(['settings' => ['displayErrorDetails' => true]]);
 
 $app->add(function (Request $request, Response $response, $next) {
     $response = $next($request, $response);
@@ -16,26 +16,16 @@ $app->add(function (Request $request, Response $response, $next) {
             ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 });
 
-$app->get('/persona/obtenerTodas', function (Request $request, Response $response) {
-    return $response
-        ->withHeader('Content-type', 'application/json')
-        ->getBody()
-        ->write(
-            json_encode(
-                Persona::TraerTodasLasPersonas()
-            )
-        ); 
+$app->get('/persona/obtenerTodas', function (Request $request, Response $response){
+    return $response->withJson(Persona::TraerTodasLasPersonas());
 });
 
 $app->delete('/persona/borrar', function (Request $request, Response $response) {
-    return $response
-        ->withHeader('Content-type', 'application/json')
-        ->getBody()
-        ->write(
-        json_encode(                
-            Persona::BorrarPersona($request->getParam('id'))
-        )
-    );
+	//BORRA FOTO
+	unlink ('fotos/' . $request->getParam('dni') . '.png');
+	//BORRA PERSONA
+	Persona::BorrarPersona($request->getParam('id'));
+    return $response;
 });
 
 $app->post('/persona/agregar', function (Request $request, Response $response) {
@@ -75,3 +65,6 @@ $app->post('/persona/agregar', function (Request $request, Response $response) {
 });	
 
 $app->run();
+
+
+//que cosa es el next de la funcion add????

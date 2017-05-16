@@ -20,8 +20,8 @@ export class AppComponent {
     this.TraerPersonas();
     //UTILIZACIÓN DE CONSTRUCTOR DE FORMULARIOS CON VALIDACIONES
     this.formAgregar = formBuilder.group({
-        nombrePersona: ['', Validators.compose([Validators.maxLength(30), Validators.pattern('[a-zA-Z ]*'), Validators.required])],
-        apellidoPersona: ['', Validators.compose([Validators.maxLength(30), Validators.pattern('[a-zA-Z ]*'), Validators.required])],
+        nombrePersona: ['', Validators.compose([Validators.maxLength(30), Validators.pattern('^[a-zA-Z]+$'), Validators.required])],
+        apellidoPersona: ['', Validators.compose([Validators.maxLength(30), Validators.pattern('^[a-zA-Z]+$'), Validators.required])],
         dniPersona: ['', Validators.compose([Validators.maxLength(8), Validators.pattern('^[0-9]*$'), Validators.required])],
         sexoPersona: ['m', Validators.required],
         passPersona: ['', Validators.compose([Validators.maxLength(30), Validators.required])]
@@ -40,10 +40,11 @@ export class AppComponent {
 
   MostrarFormulario() {
     this.formVisible = !this.formVisible;
+    this.formAgregar.reset();
   }
 
-  EliminarPersona(id) { 
-    this.PersonaService.BorrarPersona(id)
+  EliminarPersona(id, dni) { 
+    this.PersonaService.BorrarPersona(id, dni)
       .then(() => this.TraerPersonas());
   }
 
@@ -132,12 +133,16 @@ export class AppComponent {
       formData.append('sexo', this.formAgregar.value.sexoPersona);
       formData.append('pass', this.formAgregar.value.passPersona);
       this.PersonaService.AgregarPersona(formData)
-        .then(() => this.TraerPersonas());
-      this.MostrarFormulario();
-      this.formAgregar.reset();
+        .then((data) => {
+          //SI HAY ALGUN MENSAJE DE ERROR, AVISAR E IMPEDIR
+          if(data.json() != null){
+            this.mensajeErrorFormAlta = data.json();
+            return;
+          }
+          this.formAgregar.reset();
+          this.TraerPersonas();
+          this.MostrarFormulario();
+        });
     }
   }
 }
-
-
-/////AGREGAR VALIDACION DE INCLUIR FOTO

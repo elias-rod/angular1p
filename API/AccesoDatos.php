@@ -3,37 +3,47 @@ class AccesoDatos
 {
     private static $ObjetoAccesoDatos;
     private $objetoPDO;
- 
-    private function __construct()
-    {
-        try { 
-            $this->objetoPDO = new PDO('mysql:host=localhost;dbname=ejemploabm;charset=utf8', 'root', '', 
-            array(PDO::ATTR_EMULATE_PREPARES => false,PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
+    
+    private function __construct(){
+        try {
+/*          //CREACIÓN DE LA CONEXIÓN CON EL SERVIDOR EXTERNO
+            $servername = 'mysql.hostinger.es';
+            $dbname = 'u226052131_base';
+            $username = 'u226052131_elias';
+            $password = 'garbarino';
+*/
+            //CREACIÓN DE LA CONEXIÓN CON EL SERVIDOR LOCAL
+            $servername = 'localhost';
+            $dbname = 'ejemploabm';
+            $username = 'root';
+            $password = '';
+
+            $this->objetoPDO = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password, 
+                    array(PDO::ATTR_EMULATE_PREPARES => false,PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
             $this->objetoPDO->exec("SET CHARACTER SET utf8");
-            } 
-        catch (PDOException $e) { 
-            print "Error!: " . $e->getMessage(); 
-            die();
+            }
+        catch (PDOException $error){
+            print "Error!: " . $error->getMessage();
+            exit();
         }
     }
  
-    public function RetornarConsulta($sql)
-    { 
-        return $this->objetoPDO->prepare($sql); 
-    }
-    
-     public function RetornarUltimoIdInsertado()
-    { 
-        return $this->objetoPDO->lastInsertId(); 
+    public function ObtenerConsulta($sql)
+    {
+        return $this->objetoPDO->prepare($sql);
     }
  
-    public static function dameUnObjetoAcceso()
-    { 
-        if (!isset(self::$ObjetoAccesoDatos)) {          
-            self::$ObjetoAccesoDatos = new AccesoDatos(); 
-        } 
-        return self::$ObjetoAccesoDatos;        
+    public static function ObtenerObjetoAccesoDatos()
+    {
+        if (!isset(self::$ObjetoAccesoDatos)) {
+            self::$ObjetoAccesoDatos = new AccesoDatos();
+        }
+        return self::$ObjetoAccesoDatos;
     }
-
+ 
+    //EVITA QUE EL OBJETO SE PUEDA CLONAR
+    public function __clone()
+    {
+        trigger_error('La clonación de este objeto no está permitida', E_USER_ERROR);
+    }
 }
-?>
